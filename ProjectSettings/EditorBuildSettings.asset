@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/CantStop/Launcher/Launcher.unity
+    guid: 47c5a07be5c68274c8c1a10109426f4e
+  - enabled: 1
+    path: Assets/CantStop/Prepare/PrepareGame.unity
+    guid: c514e080637338b4eb24bdefc41b9a05
+  - enabled: 1
+    path: Assets/CantStop/Game/Game.unity
+    guid: 0acead045b793ab44bc03d084e4b1ec7
+  m_configObjects: {}
