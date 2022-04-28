@@ -48,6 +48,9 @@ namespace CantStop.Game
         [SerializeField]
         private Transform nowPlayerIcon;
 
+        [SerializeField]
+        private Fade fade;
+
         #endregion
 
         #region Private Fields
@@ -65,11 +68,11 @@ namespace CantStop.Game
             if (!PhotonNetwork.IsConnected)
             {
                 SceneManager.LoadScene("Launcher");
-
                 return;
             }
 
             PlayerCount = PhotonNetwork.CurrentRoom.PlayerCount;
+            fade.gameObject.SetActive(true);
 
             if (!PhotonNetwork.IsMasterClient)
                 return;
@@ -138,6 +141,7 @@ namespace CantStop.Game
                 playerNames[i].gameObject.SetActive(true);
                 playerNames[i].SetNameText(playerOrder[i]);
             }
+            fade.FadeIn();
             if (playerOrder[0] != PhotonNetwork.LocalPlayer)
                 return;
             DiceManager.Instance.diceButton.Activate();

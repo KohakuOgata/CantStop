@@ -35,10 +35,7 @@ namespace CantStop.Prepare
         private PawnStand myStand;
 
         [SerializeField]
-        private CanvasGroup canvasGroup;
-
-        [SerializeField]
-        private float fadeTime = 5f;
+        private Fade fade;
 
         [SerializeField]
         private float standPivotDepth;
@@ -260,9 +257,8 @@ namespace CantStop.Prepare
             foreach (var player in players)
                 if ((PlayerColor)player.CustomProperties[PlayerManager.ColorKey] == PlayerColor.None)
                     return;
-            canvasGroup.blocksRaycasts = true;
             PhotonNetwork.CurrentRoom.IsOpen = false;
-            var se = canvasGroup.DOFade(1f, fadeTime);
+            var se = fade.FadeOut();
             if (!PhotonNetwork.IsMasterClient)
                 return;
             se.OnComplete(() => PhotonNetwork.LoadLevel("Game"));
