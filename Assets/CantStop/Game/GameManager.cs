@@ -45,6 +45,9 @@ namespace CantStop.Game
         [SerializeField]
         private Switch diceSwitch;
 
+        [SerializeField]
+        private Transform nowPlayerIcon;
+
         #endregion
 
         #region Private Fields
@@ -94,6 +97,7 @@ namespace CantStop.Game
         }
 
         #endregion
+
         #region Pun Callbacks
         public override void OnLeftRoom()
         {
@@ -116,6 +120,11 @@ namespace CantStop.Game
 
         }
 
+        public void OnPressedDiceButton()
+        {
+            
+        }
+
         #endregion
 
         #region Private Method
@@ -131,7 +140,7 @@ namespace CantStop.Game
             }
             if (playerOrder[0] != PhotonNetwork.LocalPlayer)
                 return;
-            diceSwitch.Activate();
+            DiceManager.Instance.diceButton.Activate();
         }
 
         #endregion

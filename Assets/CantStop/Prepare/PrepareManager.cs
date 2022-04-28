@@ -32,9 +32,6 @@ namespace CantStop.Prepare
         private List<Transform> othersStandSockets = new List<Transform>();
 
         [SerializeField]
-        private readonly float standsMoveTime = 0.5f;
-
-        [SerializeField]
         private PawnStand myStand;
 
         [SerializeField]
