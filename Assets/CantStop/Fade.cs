@@ -9,20 +9,23 @@ public class Fade : MonoBehaviour
     public CanvasGroup cg;
     const float DefaultFadeTime = 5;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         cg = GetComponent<CanvasGroup>();
     }
 
     public void FadeIn(float fadeTime = DefaultFadeTime)
     {
-        cg.DOFade(0, fadeTime).
-            OnComplete(() => cg.blocksRaycasts = false);
+        cg.blocksRaycasts = false;
+        cg.DOFade(0, fadeTime);
     }
 
-    public DG.Tweening.Core.TweenerCore<float, float, DG.Tweening.Plugins.Options.FloatOptions> FadeOut(float fadeTime = DefaultFadeTime)
+    public void FadeOut(TweenCallback onComplete = null)
     {
         cg.blocksRaycasts = true;
-        return cg.DOFade(1, fadeTime);
+        var tween = cg.DOFade(1, DefaultFadeTime);
+        if (onComplete == null)
+            return;
+        tween.OnComplete(onComplete);
     }
 }

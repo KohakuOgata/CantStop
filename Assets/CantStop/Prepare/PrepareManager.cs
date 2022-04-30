@@ -252,16 +252,18 @@ namespace CantStop.Prepare
         public void OnBellClicked()
         {
             var players = PhotonNetwork.PlayerList;
-            if (players.Length < 2)
-                return;
+            //if (players.Length < 2)
+            //    return;
             foreach (var player in players)
                 if ((PlayerColor)player.CustomProperties[PlayerManager.ColorKey] == PlayerColor.None)
                     return;
             PhotonNetwork.CurrentRoom.IsOpen = false;
-            var se = fade.FadeOut();
-            if (!PhotonNetwork.IsMasterClient)
+            if (PhotonNetwork.IsMasterClient)
+            {
+                fade.FadeOut(() => PhotonNetwork.LoadLevel("Game"));
                 return;
-            se.OnComplete(() => PhotonNetwork.LoadLevel("Game"));
+            }
+            fade.FadeOut();
         }
 
         #endregion

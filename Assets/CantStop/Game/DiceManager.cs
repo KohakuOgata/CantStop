@@ -30,21 +30,16 @@ namespace CantStop.Game
             RollingUpdate();
         }
 
-        public void Roll()
+        public IEnumerator Roll()
         {
             photonView.RPC(nameof(StartRolling), RpcTarget.All);
-            DOTween.Sequence().
-                AppendInterval(1).
-                AppendCallback(() =>
-                {
-                    var nums = new int[4];
-                    for(int i =0; i < 4; i++)
-                    {
-                        nums[i] = Random.Range(1, 6);
-                    }
-                    photonView.RPC(nameof(EndRolling), RpcTarget.All, nums);
-                    GameManager.Instance.OnComplitedRoll(nums);
-                });
+            yield return new WaitForSeconds(1);
+            var nums = new int[4];
+            for (int i = 0; i < 4; i++)
+            {
+                nums[i] = Random.Range(1, 6);
+            }
+            photonView.RPC(nameof(EndRolling), RpcTarget.All, nums);
         }
 
         void RollingUpdate()
@@ -58,22 +53,21 @@ namespace CantStop.Game
         }
 
         [PunRPC]
-        void StartRolling()
+        public void StartRolling()
         {
             isRollingDice = true;
-            diceButton.Deactivate();
-            diceButton.OnCenter();
         }
 
         [PunRPC]
         void EndRolling(int[] nums)
         {
             isRollingDice = false;
-            diceButton.OffCenter();
+            diceButton.InteractAnimation();
             for (int i = 0; i < 4; i++)
             {
                 dices[i].text = nums[i].ToString();
             }
+            GameManager.Instance.OnComplitedRoll(nums);
         }
     }
 }

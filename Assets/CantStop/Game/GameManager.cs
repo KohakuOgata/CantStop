@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 using Props = ExitGames.Client.Photon.Hashtable;
+using TMPro;
 
 namespace CantStop.Game
 {
@@ -23,17 +24,23 @@ namespace CantStop.Game
 
         public const string KeyPlayerOrder = "o";
 
+        public const int ClimbersNum = 3;
+
         #endregion
 
         #region Public Fields
 
         public static GameState gameState = GameState.BeforeStart;
 
-        public static Player[] playerOrder;
+        public int[] playerOrder;
 
         public static GameManager Instance;
 
-        public static int PlayerCount { get; private set; }
+        public int PlayerCount { get; private set; }
+
+        public int climbersNumOnRoot { get; private set; }
+
+        public Root[] roots = new Root[10];
 
         #endregion
 
@@ -51,11 +58,20 @@ namespace CantStop.Game
         [SerializeField]
         private Fade fade;
 
+        [SerializeField]
+        private Climber[] climbers = new Climber[3];
+
+        [SerializeField]
+        private Transform[] climberSockets = new Transform[3];
+
+        [SerializeField]
+        private DiceResult[] diceResults = new DiceResult[3];
+
         #endregion
 
         #region Private Fields
 
-
+        private Player[] players;
         #endregion
 
         #region MonoBehaviour Callbacks
@@ -73,17 +89,17 @@ namespace CantStop.Game
 
             PlayerCount = PhotonNetwork.CurrentRoom.PlayerCount;
             fade.gameObject.SetActive(true);
+            players = PhotonNetwork.PlayerList;
 
             if (!PhotonNetwork.IsMasterClient)
                 return;
 
             var roomProps = new Props() { { KeyNowPlayer, 0 }, { KeyGameState, GameState.BeforeStart } };
 
-            playerOrder = new Player[PlayerCount];
-            var players = PhotonNetwork.PlayerList;
+            playerOrder = new int[PlayerCount];
             for(int i = 0; i < PlayerCount; i++)
             {
-                playerOrder[i] = players[i];
+                playerOrder[i] = i;
             }
             for(int i = 0; i < PlayerCount; i++)
             {
@@ -120,7 +136,9 @@ namespace CantStop.Game
 
         public void OnComplitedRoll(int[] diceNums)
         {
-
+            diceResults[0].SetRoots(new int[] { diceNums[0] + diceNums[1], diceNums[2] + diceNums[3] });
+            diceResults[1].SetRoots(new int[] { diceNums[0] + diceNums[2], diceNums[1] + diceNums[3] });
+            diceResults[2].SetRoots(new int[] { diceNums[0] + diceNums[3], diceNums[1] + diceNums[2] });
         }
 
         public void OnPressedDiceButton()
@@ -128,6 +146,26 @@ namespace CantStop.Game
             
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rootNum">2~12</param>
+        /// <returns></returns>
+        public bool CheckCanClimbRoot(int rootNum)
+        {
+            var root = roots[rootNum - 2];
+            return !root.hasBeenClimbed && (climbersNumOnRoot < ClimbersNum || root.isClimbedNow);
+        }
+
+        public void OnPressedRootButton(int[] rootNums)
+        {
+
+        }
+
+        public void OnPressedRootButton(int rootNum)
+        {
+
+        }
         #endregion
 
         #region Private Method
@@ -135,14 +173,14 @@ namespace CantStop.Game
         [PunRPC]
         private void OnCompletedInit()
         {
-            playerOrder = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[KeyPlayerOrder];
+            playerOrder = (int[])PhotonNetwork.CurrentRoom.CustomProperties[KeyPlayerOrder];
             for(int i = 0; i < PlayerCount; i++)
             {
                 playerNames[i].gameObject.SetActive(true);
-                playerNames[i].SetNameText(playerOrder[i]);
+                playerNames[i].SetNameText(players[playerOrder[i]]);
             }
             fade.FadeIn();
-            if (playerOrder[0] != PhotonNetwork.LocalPlayer)
+            if (players[playerOrder[0]] != PhotonNetwork.LocalPlayer)
                 return;
             DiceManager.Instance.diceButton.Activate();
         }

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 9136982721377359135}
   - component: {fileID: 9136982721377359132}
   - component: {fileID: 1932661696590777945}
+  - component: {fileID: -5770457690996717432}
   m_Layer: 6
   m_Name: Switch
   m_TagString: Untagged
@@ -55,6 +56,9 @@ MonoBehaviour:
   meshRenderer: {fileID: 9136982721377359112}
   emissionColor: {r: 3.482202, g: 3.482202, b: 3.482202, a: 1}
   fadeTime: 0.3
+  onPressed:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &9136982721377359132
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -85,6 +89,26 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls: []
+--- !u!95 &-5770457690996717432
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9136982721377359120}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: b9d6cdbca079cae418f13afad9f8443d, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &9136982721377359122
 GameObject:
   m_ObjectHideFlags: 0

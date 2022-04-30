@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using DG.Tweening;
 
 namespace CantStop
@@ -16,8 +18,16 @@ namespace CantStop
         [SerializeField]
         private float fadeTime = 0.3f;
         private Collider myCollider;
+        private Animator animator;
+        [SerializeField]
+        public UnityEvent onPressed = new UnityEvent();
+        [SerializeField]
+        private UnityEvent onReleased = new UnityEvent();
+        private bool isPressed = false;
+        private int interactAnimationId;
+        private EventTrigger eventTrigger;
 
-        private void Start()
+        private void Awake()
         {
             RingMaterial = meshRenderer.materials[1];
             CenterMaterial = meshRenderer.materials[2];
@@ -25,6 +35,19 @@ namespace CantStop
             CenterMaterial.EnableKeyword("_EMISSION");
             myCollider = GetComponent<BoxCollider>();
             myCollider.enabled = false;
+            animator = GetComponent<Animator>();
+            interactAnimationId = Animator.StringToHash("Interacted");
+            eventTrigger = GetComponent<EventTrigger>();
+            AddListnerOnClicked((x) => InteractAnimation());
+        }
+
+        public void AddListnerOnClicked(UnityAction<BaseEventData> call)
+        {
+            Debug.Log("Switch AddListherOnCliced Called");
+            var entry = new EventTrigger.Entry();
+            entry.eventID = EventTriggerType.PointerClick;
+            entry.callback.AddListener(call);
+            eventTrigger.triggers.Add(entry);
         }
 
         public void OnRing()
@@ -75,6 +98,30 @@ namespace CantStop
         {
             OffRing();
             myCollider.enabled = false;
+        }
+
+        public void InteractAnimation()
+        {
+            Debug.Log("InteractAnimation Called");
+            animator.SetTrigger(interactAnimationId);
+            isPressed = !isPressed;
+            if (isPressed)
+            {
+                OnCenter();
+                return;
+            }
+            OffCenter();
+        }
+
+        public void OnPressed()
+        {
+            Debug.Log("Switch OnPressed() called");
+            onPressed.Invoke();
+        }
+
+        public void OnReleased()
+        {
+            onReleased.Invoke();
         }
     }
 }
