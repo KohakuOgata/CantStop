@@ -14,7 +14,7 @@ namespace CantStop.Game
         public void SetNameText(Player player)
         {
             textMesh.text = player.NickName;
-            textMesh.color = PlayerManager.colors[(PlayerColor)player.CustomProperties[PlayerManager.ColorKey]];
+            textMesh.color = PlayerManager.colors[(PlayerColor)player.CustomProperties[PlayerManager.KeyColor]];
         }
     }
 }

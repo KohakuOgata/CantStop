@@ -5,7 +5,7 @@ using TMPro;
 using DG.Tweening;
 using Photon.Realtime;
 
-namespace CantStop
+namespace CantStop.Prepare
 {
     public class PawnStand : MonoBehaviour
     {
@@ -42,13 +42,17 @@ namespace CantStop
         public void Press(PlayerColor color)
         {
             woodPart.DOLocalMoveY(initialSwitchHeight - switchMoveHeight, moveTime).SetEase(Ease.Linear).
-                OnComplete(() => textMesh.color = PlayerManager.colors[color]);
+                OnComplete(() => 
+                {
+                    textMesh.color = PlayerManager.colors[color];
+                    PrepareManager.Instance.TryActivateBell();
+                });
         }
 
         public void Init(Player owner)
         {
             textMesh.text = owner.NickName;
-            var ownerColor = (PlayerColor)owner.CustomProperties[PlayerManager.ColorKey];
+            var ownerColor = (PlayerColor)owner.CustomProperties[PlayerManager.KeyColor];
             if (ownerColor == PlayerColor.None)
                 return;
             woodPart.localPosition = new Vector3(woodPart.localPosition.x, pressedSwitchHeight, woodPart.localPosition.z);
@@ -57,6 +61,7 @@ namespace CantStop
 
         public void Release()
         {
+            PrepareManager.Instance.TryActivateBell();
             woodPart.DOLocalMoveY(initialSwitchHeight, moveTime).SetEase(Ease.Linear).
                 OnComplete(() => textMesh.color = PlayerManager.colors[(PlayerColor)PlayerColor.None]);
         }

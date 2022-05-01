@@ -26,6 +26,7 @@ namespace CantStop
         private bool isPressed = false;
         private int interactAnimationId;
         private EventTrigger eventTrigger;
+        public bool active { get; private set; } = false;
 
         private void Awake()
         {
@@ -43,7 +44,6 @@ namespace CantStop
 
         public void AddListnerOnClicked(UnityAction<BaseEventData> call)
         {
-            Debug.Log("Switch AddListherOnCliced Called");
             var entry = new EventTrigger.Entry();
             entry.eventID = EventTriggerType.PointerClick;
             entry.callback.AddListener(call);
@@ -52,17 +52,19 @@ namespace CantStop
 
         public void OnRing()
         {
+            var nowR = RingMaterial.color.r;
             DOTween.To( 
-                () => RingMaterial.color.r,
+                () => nowR,
                 (x) => RingMaterial.SetColor("_EmissionColor", new Color(x, x, x, 1)),
                 emissionColor.r,
-                fadeTime * (1.0f - RingMaterial.color.r / emissionColor.r));
+                fadeTime * (1.0f - nowR / emissionColor.r));
         }
 
         public void OffRing()
         {
+            var nowR = RingMaterial.color.r;
             DOTween.To(
-                () => RingMaterial.color.r,
+                () => nowR,
                 (x) => RingMaterial.SetColor("_EmissionColor", new Color(x, x, x, 1)),
                 0,
                 fadeTime).
@@ -71,17 +73,19 @@ namespace CantStop
 
         public void OnCenter()
         {
+            var nowR = RingMaterial.color.r;
             DOTween.To(
-                () => CenterMaterial.color.r,
+                () => nowR,
                 (x) => CenterMaterial.SetColor("_EmissionColor", new Color(x, x, x, 1)),
                 emissionColor.r,
-                fadeTime * (1.0f - CenterMaterial.color.r / emissionColor.r));
+                fadeTime * (1.0f - nowR / emissionColor.r));
         }
 
         public void OffCenter()
         {
+            var nowR = RingMaterial.color.r;
             DOTween.To(
-                () => CenterMaterial.color.r,
+                () => nowR,
                 (x) => CenterMaterial.SetColor("_EmissionColor", new Color(x, x, x, 1)),
                 0,
                 fadeTime).
@@ -92,12 +96,14 @@ namespace CantStop
         {
             OnRing();
             myCollider.enabled = true;
+            active = true;
         }
 
         public void Deactivate()
         {
             OffRing();
             myCollider.enabled = false;
+            active = false;
         }
 
         public void InteractAnimation()
@@ -115,7 +121,6 @@ namespace CantStop
 
         public void OnPressed()
         {
-            Debug.Log("Switch OnPressed() called");
             onPressed.Invoke();
         }
 

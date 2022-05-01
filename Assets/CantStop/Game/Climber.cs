@@ -7,7 +7,7 @@ namespace CantStop.Game
 {
     public class Climber : MonoBehaviour
     {
-        int? rootNum = null;
-        int? pointNum = null;
+        public int rootNum = -1;
+        public int pointNum = -1;
     }
 }

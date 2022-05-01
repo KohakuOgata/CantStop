@@ -28,7 +28,7 @@ namespace CantStop
 
         public static GameObject LocalPlayerInstance;
 
-        public const string ColorKey = "c";
+        public const string KeyColor = "c";
 
         #endregion
 
@@ -43,7 +43,7 @@ namespace CantStop
             if (photonView.IsMine)
             {
                 LocalPlayerInstance = gameObject;
-                PhotonNetwork.LocalPlayer.SetCustomProperties(new Props() { { ColorKey, PlayerColor.None } });
+                PhotonNetwork.LocalPlayer.SetCustomProperties(new Props() { { KeyColor, PlayerColor.None } });
                 Debug.Log("Local Players Color Inited");
             }
 

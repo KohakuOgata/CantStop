@@ -22,7 +22,7 @@ namespace CantStop.Game
 
         public const string KeyGameState = "s";
 
-        public const string KeyPlayerOrder = "o";
+        public const string KeyOrderedPlayers = "o";
 
         public const int ClimbersNum = 3;
 
@@ -32,7 +32,7 @@ namespace CantStop.Game
 
         public static GameState gameState = GameState.BeforeStart;
 
-        public int[] playerOrder;
+        public Player[] orderedPlayers;
 
         public static GameManager Instance;
 
@@ -40,7 +40,11 @@ namespace CantStop.Game
 
         public int climbersNumOnRoot { get; private set; }
 
-        public Root[] roots = new Root[10];
+        public int nowPlayerIndex { get; private set; } = 0;
+
+        public Climber[] climbers = new Climber[3];
+
+        public Bell bell;
 
         #endregion
 
@@ -59,9 +63,6 @@ namespace CantStop.Game
         private Fade fade;
 
         [SerializeField]
-        private Climber[] climbers = new Climber[3];
-
-        [SerializeField]
         private Transform[] climberSockets = new Transform[3];
 
         [SerializeField]
@@ -72,6 +73,8 @@ namespace CantStop.Game
         #region Private Fields
 
         private Player[] players;
+
+        private RootManager rootManager;
         #endregion
 
         #region MonoBehaviour Callbacks
@@ -90,25 +93,22 @@ namespace CantStop.Game
             PlayerCount = PhotonNetwork.CurrentRoom.PlayerCount;
             fade.gameObject.SetActive(true);
             players = PhotonNetwork.PlayerList;
+            rootManager = RootManager.Instance;
 
             if (!PhotonNetwork.IsMasterClient)
                 return;
 
             var roomProps = new Props() { { KeyNowPlayer, 0 }, { KeyGameState, GameState.BeforeStart } };
 
-            playerOrder = new int[PlayerCount];
-            for(int i = 0; i < PlayerCount; i++)
-            {
-                playerOrder[i] = i;
-            }
+            orderedPlayers = players;
             for(int i = 0; i < PlayerCount; i++)
             {
                 var random = Random.Range(0, PlayerCount - 1);
-                var buf = playerOrder[i];
-                playerOrder[i] = playerOrder[random];
-                playerOrder[random] = buf;
+                var buf = orderedPlayers[i];
+                orderedPlayers[i] = orderedPlayers[random];
+                orderedPlayers[random] = buf;
             }
-            roomProps.Add(KeyPlayerOrder, playerOrder);
+            roomProps.Add(KeyOrderedPlayers, orderedPlayers);
 
             PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
 
@@ -136,9 +136,21 @@ namespace CantStop.Game
 
         public void OnComplitedRoll(int[] diceNums)
         {
+            climbersNumOnRoot = 0;
+            foreach(var climber in climbers)
+            {
+                if (climber.rootNum != -1)
+                    climbersNumOnRoot += 1;
+            }
             diceResults[0].SetRoots(new int[] { diceNums[0] + diceNums[1], diceNums[2] + diceNums[3] });
             diceResults[1].SetRoots(new int[] { diceNums[0] + diceNums[2], diceNums[1] + diceNums[3] });
             diceResults[2].SetRoots(new int[] { diceNums[0] + diceNums[3], diceNums[1] + diceNums[2] });
+            if (orderedPlayers[nowPlayerIndex] != PhotonNetwork.LocalPlayer)
+                return;
+            foreach(var diceResult in diceResults)
+            {
+                diceResult.ActivateButtons();
+            }
         }
 
         public void OnPressedDiceButton()
@@ -153,18 +165,24 @@ namespace CantStop.Game
         /// <returns></returns>
         public bool CheckCanClimbRoot(int rootNum)
         {
-            var root = roots[rootNum - 2];
-            return !root.hasBeenClimbed && (climbersNumOnRoot < ClimbersNum || root.isClimbedNow);
+            var root = RootManager.Instance.GetRoot(rootNum);
+            return !root.hasBeenClimbed && (climbersNumOnRoot < ClimbersNum || root.climbingClimber);
         }
 
-        public void OnPressedRootButton(int[] rootNums)
+        public void OnCompleteClimb()
         {
-
+            diceSwitch.Activate();
+            bell.Activate();
         }
 
-        public void OnPressedRootButton(int rootNum)
+        [PunRPC]
+        public void OnPressedRootButton(int[] rootNums, PhotonMessageInfo info)
         {
-
+            Debug.Log("OnPressedRootButton" + rootNums);
+            if(info.Sender == PhotonNetwork.LocalPlayer)
+            foreach (var diceResult in diceResults)
+                diceResult.DeactiveAllButtons();
+            rootManager.Climb(rootNums);
         }
         #endregion
 
@@ -173,14 +191,14 @@ namespace CantStop.Game
         [PunRPC]
         private void OnCompletedInit()
         {
-            playerOrder = (int[])PhotonNetwork.CurrentRoom.CustomProperties[KeyPlayerOrder];
+            orderedPlayers = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[KeyOrderedPlayers];
             for(int i = 0; i < PlayerCount; i++)
             {
                 playerNames[i].gameObject.SetActive(true);
-                playerNames[i].SetNameText(players[playerOrder[i]]);
+                playerNames[i].SetNameText(orderedPlayers[i]);
             }
             fade.FadeIn();
-            if (players[playerOrder[0]] != PhotonNetwork.LocalPlayer)
+            if (orderedPlayers[0] != PhotonNetwork.LocalPlayer)
                 return;
             DiceManager.Instance.diceButton.Activate();
         }

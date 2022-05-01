@@ -14,11 +14,28 @@ namespace CantStop.Game
         private Color emissionColor;
         [SerializeField]
         private float fadeTime = 0.3f;
+        [SerializeField]
+        private Transform redSocket;
+        [SerializeField]
+        private Transform blueSocket;
+        [SerializeField]
+        private Transform greenSocket;
+        [SerializeField]
+        private Transform yellowSocket;
+
+        public Dictionary<PlayerColor, Transform> sockets;
 
         private void Awake()
         {
             RingMaterial = meshRenderer.materials[1];
             RingMaterial.EnableKeyword("_EMISSION");
+            sockets = new Dictionary<PlayerColor, Transform>
+            {
+                {PlayerColor.Red, redSocket },
+                {PlayerColor.Blue, blueSocket },
+                {PlayerColor.Green, greenSocket },
+                {PlayerColor.Yellow, yellowSocket },
+            };
         }
         public void OnRing()
         {

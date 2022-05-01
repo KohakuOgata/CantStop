@@ -37,7 +37,7 @@ namespace CantStop.Game
             var nums = new int[4];
             for (int i = 0; i < 4; i++)
             {
-                nums[i] = Random.Range(1, 6);
+                nums[i] = Random.Range(1, 7);
             }
             photonView.RPC(nameof(EndRolling), RpcTarget.All, nums);
         }

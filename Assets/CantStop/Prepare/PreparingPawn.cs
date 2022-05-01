@@ -25,7 +25,7 @@ namespace CantStop.Prepare
         [SerializeField]
         private float hoverHeight = 0.1f;
         [SerializeField]
-        Collider collider;
+        new Collider collider;
         [SerializeField]
         Transform modelSocket;
 
@@ -71,7 +71,7 @@ namespace CantStop.Prepare
                 photonView.RPC(nameof(OnReturned), RpcTarget.AllViaServer, true);
                 return;
             }
-            var localPlayerColor = (PlayerColor)PhotonNetwork.LocalPlayer.CustomProperties[PlayerManager.ColorKey];
+            var localPlayerColor = (PlayerColor)PhotonNetwork.LocalPlayer.CustomProperties[PlayerManager.KeyColor];
             if (localPlayerColor != PlayerColor.None)
             {
                 PrepareManager.Instance.pawns[localPlayerColor].photonView.RPC(nameof(OnReturned), RpcTarget.AllViaServer, false);
@@ -96,7 +96,7 @@ namespace CantStop.Prepare
                 sequence.AppendCallback(() => stand.Release());
                 if (PhotonNetwork.IsMasterClient)
                 {
-                    owner.SetCustomProperties(new Props() { { PlayerManager.ColorKey, (PlayerColor)PlayerColor.None } });
+                    owner.SetCustomProperties(new Props() { { PlayerManager.KeyColor, (PlayerColor)PlayerColor.None } });
                 }
             }
             owner = null;
@@ -112,7 +112,7 @@ namespace CantStop.Prepare
 
             if (info.Sender == PhotonNetwork.LocalPlayer)
             {
-                PhotonNetwork.LocalPlayer.SetCustomProperties(new Props() { { PlayerManager.ColorKey, color } });
+                PhotonNetwork.LocalPlayer.SetCustomProperties(new Props() { { PlayerManager.KeyColor, color } });
             }
             transform.parent = GetSocket(info.Sender);
             transform.DOMove(transform.parent.position, moveTime).SetEase(ease).

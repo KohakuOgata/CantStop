@@ -46,6 +46,9 @@ namespace CantStop.Prepare
         [SerializeField]
         private float standAppearTime = 1f;
 
+        [SerializeField]
+        private Bell bell;
+
         #endregion
 
         #region privarte Fields
@@ -102,7 +105,7 @@ namespace CantStop.Prepare
             {
                 var other = PhotonNetwork.PlayerListOthers[i];
                 SpawnStand(other, i).Init(other);
-                var othersColor = (PlayerColor)other.CustomProperties[PlayerManager.ColorKey];
+                var othersColor = (PlayerColor)other.CustomProperties[PlayerManager.KeyColor];
                 if (othersColor == PlayerColor.None)
                     continue;
                 pawns[othersColor].OnGot(other);
@@ -141,7 +144,7 @@ namespace CantStop.Prepare
         public override void OnPlayerLeftRoom(Player other)
         {
             Debug.Log("OnPlayerLeftRoom() " + other.NickName + "(" + other.ActorNumber + ")"); // seen when other disconnects
-            var othersColor = (PlayerColor)other.CustomProperties[PlayerManager.ColorKey];
+            var othersColor = (PlayerColor)other.CustomProperties[PlayerManager.KeyColor];
             if (othersColor != PlayerColor.None)
             {
                 pawns[othersColor].OnReturned(false);
@@ -177,7 +180,7 @@ namespace CantStop.Prepare
         public override void OnDisconnected(DisconnectCause cause)
         {
             Debug.Log("OnDisconnected()");
-            var localPlayerColor = (PlayerColor)PhotonNetwork.LocalPlayer.CustomProperties[PlayerManager.ColorKey];
+            var localPlayerColor = (PlayerColor)PhotonNetwork.LocalPlayer.CustomProperties[PlayerManager.KeyColor];
             if (localPlayerColor != PlayerColor.None)
             {
                 pawns[localPlayerColor].photonView.RPC("OnReturned", RpcTarget.Others, false);
@@ -220,6 +223,25 @@ namespace CantStop.Prepare
             return otherStands[actorNumber];
         }
 
+        public void TryActivateBell()
+        {
+            var players = PhotonNetwork.PlayerList;
+            //if (players.Length < 2)
+            //    return;
+            foreach (var player in players)
+                if ((PlayerColor)player.CustomProperties[PlayerManager.KeyColor] == PlayerColor.None)
+                {
+                    bell.Deactivate();
+                    return;
+                }
+            bell.Activate();
+        }
+
+        public void OnBellClicked()
+        {
+            photonView.RPC(nameof(GoGameScene), RpcTarget.All);
+        }
+
         #endregion
 
         #region Private Methods
@@ -249,21 +271,17 @@ namespace CantStop.Prepare
             otherStands[actorNumber].MoveTo(GetStandSocket(standIndex).position);
         }
 
-        public void OnBellClicked()
+        [PunRPC]
+        void GoGameScene()
         {
-            var players = PhotonNetwork.PlayerList;
-            //if (players.Length < 2)
-            //    return;
-            foreach (var player in players)
-                if ((PlayerColor)player.CustomProperties[PlayerManager.ColorKey] == PlayerColor.None)
-                    return;
-            PhotonNetwork.CurrentRoom.IsOpen = false;
-            if (PhotonNetwork.IsMasterClient)
+            bell.ClickedAnimation();
+            if (!PhotonNetwork.IsMasterClient)
             {
-                fade.FadeOut(() => PhotonNetwork.LoadLevel("Game"));
+                fade.FadeOut();
                 return;
             }
-            fade.FadeOut();
+            PhotonNetwork.CurrentRoom.IsOpen = false;
+            fade.FadeOut(() => PhotonNetwork.LoadLevel("Game"));
         }
 
         #endregion

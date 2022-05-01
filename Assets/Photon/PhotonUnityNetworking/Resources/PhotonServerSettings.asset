@@ -51,6 +51,10 @@ MonoBehaviour:
   - OnPressedRpc
   - OnReleased
   - OnPressedOthers
+  - OnClickedOthersBigButton
+  - OnClickedOthersSmallButton
+  - OnPressedRootButton
+  - GoGameScene
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
