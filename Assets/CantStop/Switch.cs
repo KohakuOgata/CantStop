@@ -9,14 +9,8 @@ namespace CantStop
 {
     public class Switch : MonoBehaviour
     {
-        [SerializeField]
-        private MeshRenderer meshRenderer;
-        private Material RingMaterial;
-        private Material CenterMaterial;
-        [SerializeField, ColorUsage(true, true)]
-        private Color emissionColor;
-        [SerializeField]
-        private float fadeTime = 0.3f;
+        public EmissivalPart ring;
+        public EmissivalPart center;
         private Collider myCollider;
         private Animator animator;
         [SerializeField]
@@ -30,10 +24,10 @@ namespace CantStop
 
         private void Awake()
         {
-            RingMaterial = meshRenderer.materials[1];
-            CenterMaterial = meshRenderer.materials[2];
-            RingMaterial.EnableKeyword("_EMISSION");
-            CenterMaterial.EnableKeyword("_EMISSION");
+            //ring = meshRenderer.materials[1];
+            //center = meshRenderer.materials[2];
+            //ring.EnableKeyword("_EMISSION");
+            //center.EnableKeyword("_EMISSION");
             myCollider = GetComponent<BoxCollider>();
             myCollider.enabled = false;
             animator = GetComponent<Animator>();
@@ -50,58 +44,58 @@ namespace CantStop
             eventTrigger.triggers.Add(entry);
         }
 
-        public void OnRing()
-        {
-            var nowR = RingMaterial.color.r;
-            DOTween.To( 
-                () => nowR,
-                (x) => RingMaterial.SetColor("_EmissionColor", new Color(x, x, x, 1)),
-                emissionColor.r,
-                fadeTime * (1.0f - nowR / emissionColor.r));
-        }
+        //public void OnRing()
+        //{
+        //    var nowR = ring.color.r;
+        //    DOTween.To( 
+        //        () => nowR,
+        //        (x) => ring.SetColor("_EmissionColor", new Color(x, x, x, 1)),
+        //        emissionColor.r,
+        //        fadeTime * (1.0f - nowR / emissionColor.r));
+        //}
 
-        public void OffRing()
-        {
-            var nowR = RingMaterial.color.r;
-            DOTween.To(
-                () => nowR,
-                (x) => RingMaterial.SetColor("_EmissionColor", new Color(x, x, x, 1)),
-                0,
-                fadeTime).
-                SetEase(Ease.InQuad);
-        }
+        //public void OffRing()
+        //{
+        //    var nowR = ring.color.r;
+        //    DOTween.To(
+        //        () => nowR,
+        //        (x) => ring.SetColor("_EmissionColor", new Color(x, x, x, 1)),
+        //        0,
+        //        fadeTime).
+        //        SetEase(Ease.InQuad);
+        //}
 
-        public void OnCenter()
-        {
-            var nowR = RingMaterial.color.r;
-            DOTween.To(
-                () => nowR,
-                (x) => CenterMaterial.SetColor("_EmissionColor", new Color(x, x, x, 1)),
-                emissionColor.r,
-                fadeTime * (1.0f - nowR / emissionColor.r));
-        }
+        //public void OnCenter()
+        //{
+        //    var nowR = ring.color.r;
+        //    DOTween.To(
+        //        () => nowR,
+        //        (x) => center.SetColor("_EmissionColor", new Color(x, x, x, 1)),
+        //        emissionColor.r,
+        //        fadeTime * (1.0f - nowR / emissionColor.r));
+        //}
 
-        public void OffCenter()
-        {
-            var nowR = RingMaterial.color.r;
-            DOTween.To(
-                () => nowR,
-                (x) => CenterMaterial.SetColor("_EmissionColor", new Color(x, x, x, 1)),
-                0,
-                fadeTime).
-                SetEase(Ease.InQuad);
-        }
+        //public void OffCenter()
+        //{
+        //    var nowR = ring.color.r;
+        //    DOTween.To(
+        //        () => nowR,
+        //        (x) => center.SetColor("_EmissionColor", new Color(x, x, x, 1)),
+        //        0,
+        //        fadeTime).
+        //        SetEase(Ease.InQuad);
+        //}
 
         public void Activate()
         {
-            OnRing();
+            ring.On();
             myCollider.enabled = true;
             active = true;
         }
 
         public void Deactivate()
         {
-            OffRing();
+            ring.Off();
             myCollider.enabled = false;
             active = false;
         }
@@ -113,10 +107,10 @@ namespace CantStop
             isPressed = !isPressed;
             if (isPressed)
             {
-                OnCenter();
+                center.On();
                 return;
             }
-            OffCenter();
+            center.Off();
         }
 
         public void OnPressed()

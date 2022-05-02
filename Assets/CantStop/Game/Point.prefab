@@ -44,7 +44,6 @@ GameObject:
   - component: {fileID: 5259687639266401817}
   - component: {fileID: 6142052435055326306}
   - component: {fileID: 8564854711994498415}
-  - component: {fileID: 6299533391533843989}
   m_Layer: 0
   m_Name: Cylinder
   m_TagString: Untagged
@@ -3622,20 +3621,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3686352770406333395}
   m_Mesh: {fileID: 0}
---- !u!64 &6299533391533843989
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3686352770406333395}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
 --- !u!1 &5452771110394661736
 GameObject:
   m_ObjectHideFlags: 0
@@ -3646,6 +3631,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4285346317892457902}
   - component: {fileID: 5237433791267038745}
+  - component: {fileID: 230281753642773091}
   m_Layer: 0
   m_Name: Point
   m_TagString: Untagged
@@ -3689,6 +3675,22 @@ MonoBehaviour:
   blueSocket: {fileID: 6610690677086878181}
   greenSocket: {fileID: 7797066323744002608}
   yellowSocket: {fileID: 1720130831638777017}
+--- !u!114 &230281753642773091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5452771110394661736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cc626f468579054080bd84e7c73d3a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshRenderer: {fileID: 6142052435055326306}
+  materialIndex: 1
+  fadeTime: 0.3
+  color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &5543045222020132776
 GameObject:
   m_ObjectHideFlags: 0

@@ -23,6 +23,8 @@ namespace CantStop.Game
         [SerializeField]
         private Transform yellowSocket;
 
+        private EmissivalPart emissival;
+
         public Dictionary<PlayerColor, Transform> sockets;
 
         private void Awake()
@@ -37,23 +39,29 @@ namespace CantStop.Game
                 {PlayerColor.Yellow, yellowSocket },
             };
         }
+        private void Start()
+        {
+            emissival = GetComponent<EmissivalPart>();
+        }
         public void OnRing()
         {
-            DOTween.To(
-                () => RingMaterial.color.r,
-                (x) => RingMaterial.SetColor("_EmissionColor", new Color(x, x, x, 1)),
-                emissionColor.r,
-                fadeTime * (1.0f - RingMaterial.color.r / emissionColor.r));
+            //DOTween.To(
+            //    () => RingMaterial.color.r,
+            //    (x) => RingMaterial.SetColor("_EmissionColor", new Color(x, x, x, 1)),
+            //    emissionColor.r,
+            //    fadeTime * (1.0f - RingMaterial.color.r / emissionColor.r));
+            emissival.On();
         }
 
         public void OffRing()
         {
-            DOTween.To(
-                () => RingMaterial.color.r,
-                (x) => RingMaterial.SetColor("_EmissionColor", new Color(x, x, x, 1)),
-                0,
-                fadeTime).
-                SetEase(Ease.InQuad);
+            //DOTween.To(
+            //    () => RingMaterial.color.r,
+            //    (x) => RingMaterial.SetColor("_EmissionColor", new Color(x, x, x, 1)),
+            //    0,
+            //    fadeTime).
+            //    SetEase(Ease.InQuad);
+            emissival.Off();
         }
     }
 }

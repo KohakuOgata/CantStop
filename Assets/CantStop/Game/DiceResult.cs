@@ -84,7 +84,7 @@ namespace CantStop.Game
         {
             if (!(canClimb[0] || canClimb[1]))
             {
-                bigButton.OffRing();
+                bigButton.ring.On();
                 return;
             }
             if ((canClimb[0] ^ canClimb[1]))
