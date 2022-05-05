@@ -8,11 +8,6 @@ namespace CantStop.Game
     public class Point : MonoBehaviour
     {
         [SerializeField]
-        private MeshRenderer meshRenderer;
-        private Material RingMaterial;
-        [SerializeField, ColorUsage(true, true)]
-        private Color emissionColor;
-        [SerializeField]
         private float fadeTime = 0.3f;
         [SerializeField]
         private Transform redSocket;
@@ -23,14 +18,12 @@ namespace CantStop.Game
         [SerializeField]
         private Transform yellowSocket;
 
-        private EmissivalPart emissival;
+        public EmissivalPart emissival { get; private set; }
 
         public Dictionary<PlayerColor, Transform> sockets;
 
         private void Awake()
         {
-            RingMaterial = meshRenderer.materials[1];
-            RingMaterial.EnableKeyword("_EMISSION");
             sockets = new Dictionary<PlayerColor, Transform>
             {
                 {PlayerColor.Red, redSocket },
@@ -45,23 +38,35 @@ namespace CantStop.Game
         }
         public void OnRing()
         {
-            //DOTween.To(
-            //    () => RingMaterial.color.r,
-            //    (x) => RingMaterial.SetColor("_EmissionColor", new Color(x, x, x, 1)),
-            //    emissionColor.r,
-            //    fadeTime * (1.0f - RingMaterial.color.r / emissionColor.r));
             emissival.On();
         }
 
         public void OffRing()
         {
-            //DOTween.To(
-            //    () => RingMaterial.color.r,
-            //    (x) => RingMaterial.SetColor("_EmissionColor", new Color(x, x, x, 1)),
-            //    0,
-            //    fadeTime).
-            //    SetEase(Ease.InQuad);
             emissival.Off();
+        }
+
+        public void PutTent()
+        {
+            var socket = sockets[GameManager.Instance.nowColor];
+            socket.DOScale(1, fadeTime);
+            socket.DORotate(Vector3.zero, fadeTime);
+        }
+
+        public void RemoveTent(PlayerColor color)
+        {
+            var socket = sockets[color];
+            socket.DOScale(0, fadeTime);
+            socket.DORotate(new Vector3(0, 360, 0), fadeTime);
+        }
+
+        public void RemoveAllTents()
+        {
+            foreach(var socket in sockets)
+            {
+                socket.Value.DOScale(0, fadeTime);
+                socket.Value.DORotate(new Vector3(0, 360, 0), fadeTime);
+            }
         }
     }
 }

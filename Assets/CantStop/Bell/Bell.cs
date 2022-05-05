@@ -8,44 +8,31 @@ namespace CantStop
 {
     public class Bell : MonoBehaviourPun
     {
-
-        private new AudioSource audio;
+        [HideInInspector]
+        public new AudioSource audio { get; private set; }
         [SerializeField]
         private Transform bellTop;
         private new Collider collider;
-        private MeshRenderer meshRenderer;
-        private Material ringMaterial;
+        private EmissivalPart emissival;
 
         private void Start()
         {
             audio = GetComponent<AudioSource>();
             collider = GetComponent<SphereCollider>();
             collider.enabled = false;
-            meshRenderer = GetComponent<MeshRenderer>();
-            ringMaterial = meshRenderer.materials[3];
-            ringMaterial.EnableKeyword("_EMISSION");
+            emissival = GetComponent<EmissivalPart>();
         }
 
         public void Activate()
         {
             collider.enabled = true;
-            var nowR = ringMaterial.color.r;
-            DOTween.To(
-                () => nowR,
-                (x) => ringMaterial.SetColor("_EmissionColor", new Color(x, x, x, 1)),
-                1,
-                .5f * (1.0f - nowR / 1));
+            emissival.On();
         }
 
         public void Deactivate()
         {
             collider.enabled = false;
-            var nowR = ringMaterial.color.r;
-            DOTween.To(
-                () => nowR,
-                (x) => ringMaterial.SetColor("_EmissionColor", new Color(x, x, x, 1)),
-                0,
-                .5f * (nowR / 1));
+            emissival.Off();
         }
 
         public void ClickedAnimation()

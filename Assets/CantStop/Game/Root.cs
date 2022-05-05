@@ -33,13 +33,11 @@ namespace CantStop.Game
 
         public void Climb(Climber climber, int forwardNum)
         {
-            Debug.Log("Root.Climb" + forwardNum);
             var point = new Point[2] { GetNextPoint(1), GetNextPoint(2) };
-            climber.rootNum = rootNum;
-            climber.pointNum += forwardNum;
             climbingClimber = climber;
-            var color = (PlayerColor)GameManager.Instance.orderedPlayers[GameManager.Instance.nowPlayerIndex].CustomProperties[PlayerManager.KeyColor];
-            var sequence = climber.transform.DOJump(point[0].sockets[color].position, jumpPower, 1, 0.5f).SetEase(Ease.Linear);
+            climbingClimber.pointNum = Mathf.Min(pointsNum - 1, Mathf.Max(tentPos[GameManager.Instance.nowColor], climbingClimber.pointNum) + forwardNum);
+            climber.rootNum = rootNum;
+            var sequence = climber.transform.DOJump(point[0].sockets[GameManager.Instance.nowColor].position, jumpPower, 1, 0.5f).SetEase(Ease.Linear);
             point[0].OnRing();
             if (forwardNum == 1)
             {
@@ -47,9 +45,10 @@ namespace CantStop.Game
                 return;
             }
             sequence.
-                Append(climber.transform.DOJump(point[1].sockets[color].position, jumpPower, 1, 0.5f).SetEase(Ease.Linear)).
+                Append(climber.transform.DOJump(point[1].sockets[GameManager.Instance.nowColor].position, jumpPower, 1, 0.5f).SetEase(Ease.Linear)).
                 OnComplete(RootManager.Instance.OnCompleteClimbeAnimation);
-            point[1].OnRing();
+            if (point[0] != point[1])
+                point[1].OnRing();
         }
 
         public Point GetNextPoint(int forwardNum)
@@ -58,12 +57,12 @@ namespace CantStop.Game
             {
                 return points[Mathf.Min(climbingClimber.pointNum + forwardNum, pointsNum - 1)];
             }
-            return points[Mathf.Min(tentPos[(PlayerColor)GameManager.Instance.orderedPlayers[GameManager.Instance.nowPlayerIndex].CustomProperties[PlayerManager.KeyColor]] + forwardNum, pointsNum - 1)];
+            return points[Mathf.Min(tentPos[GameManager.Instance.nowColor] + forwardNum, pointsNum - 1)];
         }
 
         public void OnEmissive()
         {
-            foreach(var point in points)
+            foreach (var point in points)
             {
                 point.OnRing();
             }
@@ -71,10 +70,42 @@ namespace CantStop.Game
 
         public void OffEmissive()
         {
-            foreach(var point in points)
+            foreach (var point in points)
             {
                 point.OffRing();
             }
+        }
+
+        public bool PutTent()
+        {
+            if (tentPos[GameManager.Instance.nowColor] != -1)
+                points[tentPos[GameManager.Instance.nowColor]].RemoveTent(GameManager.Instance.nowColor);
+            points[climbingClimber.pointNum].PutTent();
+            tentPos[GameManager.Instance.nowColor] = climbingClimber.pointNum;
+            if (climbingClimber.pointNum < pointsNum - 1)
+                return false;
+            foreach (var pos in tentPos)
+            {
+                if (pos.Key == GameManager.Instance.nowColor || pos.Value == -1)
+                    continue;
+                points[pos.Value].RemoveTent(pos.Key);
+            }
+            var nowColor = PlayerManager.colors[GameManager.Instance.nowColor];
+            foreach (var point in points)
+            {
+                point.emissival.ChangeColor(nowColor);
+            }
+            return hasBeenClimbed = true;
+        }
+
+        public void Reset()
+        {
+            if (climbingClimber.pointNum < pointsNum - 1)
+                foreach (var point in points)
+                    point.OffRing();
+
+            climbingClimber = null;
+
         }
     }
 }

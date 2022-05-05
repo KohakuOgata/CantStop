@@ -80,30 +80,31 @@ namespace CantStop.Game
             numTexts[1].color = canClimb[1] ? Color.white : Color.gray;
         }
 
-        public void ActivateButtons()
+        public bool ActivateButtons()
         {
             if (!(canClimb[0] || canClimb[1]))
             {
-                bigButton.ring.On();
-                return;
+                //bigButton.ring.BlinkOff();
+                return false;
             }
             if ((canClimb[0] ^ canClimb[1]))
             {
                 if (canClimb[0])
                 {
                     smallButtons[0].Activate();
-                    return;
+                    return true;
                 }
                 smallButtons[1].Activate();
-                return;
+                return true;
             }
             if (GameManager.Instance.climbersNumOnRoot == 2 && !rootManager.GetRoot(rootNums[0]).climbingClimber && !rootManager.GetRoot(rootNums[1]).climbingClimber && rootNums[0] != rootNums[1])
             {
                 smallButtons[0].Activate();
                 smallButtons[1].Activate();
-                return;
+                return true;
             }
             bigButton.Activate();
+            return true;
         }
 
         public void OnEnterBigButton()

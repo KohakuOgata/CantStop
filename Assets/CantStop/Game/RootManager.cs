@@ -26,27 +26,26 @@ namespace CantStop.Game
 
         public Point[] GetNextPoints(int[] rootNums)
         {
-            if(rootNums.Length == 1)
+            if (rootNums.Length == 1)
                 return new Point[] { GetRoot(rootNums[0]).GetNextPoint(1) };
             if (rootNums[0] == rootNums[1])
-                return new Point[] { GetRoot(rootNums[0]).GetNextPoint(2) };
+                return new Point[] { GetRoot(rootNums[0]).GetNextPoint(1), GetRoot(rootNums[0]).GetNextPoint(2) };
             return new Point[] { GetRoot(rootNums[0]).GetNextPoint(1), GetRoot(rootNums[1]).GetNextPoint(1) };
         }
 
         public void Climb(int[] rootNums)
         {
-            Debug.Log("RootManager.Climb" + rootNums);
             climbingNum = 1;
-            if(rootNums.Length == 2)
+            if (rootNums.Length == 2)
             {
-                if(rootNums[0] == rootNums[1])
+                if (rootNums[0] == rootNums[1])
                 {
                     Climb(rootNums[0], 2);
                     return;
                 }
                 climbingNum = 2;
             }
-            foreach(var rootNum in rootNums)
+            foreach (var rootNum in rootNums)
             {
                 Climb(rootNum, 1);
             }
@@ -54,19 +53,26 @@ namespace CantStop.Game
 
         private void Climb(int rootNum, int forwardNum)
         {
-            Debug.Log("RootManager.Climb" + rootNum + "," + forwardNum);
             var root = GetRoot(rootNum);
-            Climber climber = null;
+            //Climber climber = null;
             if (root.climbingClimber)
-                climber = root.climbingClimber;
+                root.Climb(root.climbingClimber, forwardNum);
             else
-                foreach (var c in GameManager.Instance.climbers)
-                    if (c.rootNum == -1)
+                //foreach (var c in GameManager.Instance.climbers)
+                //    if (c.rootNum == -1)
+                //    {
+                //        climber = c;
+                //        break;
+                //    }
+                for (int i = 0; i < 3; i++)
+                {
+                    if (GameManager.Instance.climbers[i].rootNum == -1)
                     {
-                        climber = c;
-                        break;
+                        root.Climb(GameManager.Instance.climbers[i], forwardNum);
+                        return;
                     }
-            root.Climb(climber, forwardNum);
+                }
+
         }
 
         public void OnCompleteClimbeAnimation()
@@ -81,6 +87,11 @@ namespace CantStop.Game
             if (GameManager.Instance.orderedPlayers[GameManager.Instance.nowPlayerIndex] != PhotonNetwork.LocalPlayer)
                 return;
             GameManager.Instance.OnCompleteClimb();
+        }
+
+        public bool PutTent(int rootNum)
+        {
+            return GetRoot(rootNum).PutTent();
         }
     }
 }

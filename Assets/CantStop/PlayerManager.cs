@@ -30,6 +30,8 @@ namespace CantStop
 
         public const string KeyColor = "c";
 
+        public const string KeyScore = "s";
+
         #endregion
 
         #region Private Fields

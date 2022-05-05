@@ -77,6 +77,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b015ec07326914f49b7b8712d1a2dd69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rootNum: -1
+  pointNum: -1
+  homeSocket: {fileID: 0}
 --- !u!1001 &6248740359949490268
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -148,8 +151,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[4]
       value: 
-      objectReference: {fileID: -2274090305892019849, guid: 3b0d96a5d5027a241a07f12d8fdade6f,
-        type: 3}
+      objectReference: {fileID: 2100000, guid: 5b3826dd21e1d2b4a947c774023d1db3, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e949b52e7301c8241892c5bf8c0ccb2b, type: 3}
 --- !u!4 &5853911220940373943 stripped

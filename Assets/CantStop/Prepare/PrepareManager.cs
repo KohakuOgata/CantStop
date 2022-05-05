@@ -139,6 +139,7 @@ namespace CantStop.Prepare
                 MoveStand(PhotonNetwork.PlayerListOthers[i].ActorNumber, i);
             }
             SpawnStand(other, PhotonNetwork.CurrentRoom.PlayerCount - 2);
+            bell.Deactivate();
         }
 
         public override void OnPlayerLeftRoom(Player other)
@@ -168,6 +169,8 @@ namespace CantStop.Prepare
             {
                 MoveStand(PhotonNetwork.PlayerListOthers[i].ActorNumber, i);
             }
+            if (PhotonNetwork.CurrentRoom.PlayerCount == 1 && (PlayerColor)PhotonNetwork.LocalPlayer.CustomProperties[PlayerManager.KeyColor] != PlayerColor.None)
+                bell.Deactivate();
         }
 
         public override void OnLeftRoom()
@@ -226,8 +229,10 @@ namespace CantStop.Prepare
         public void TryActivateBell()
         {
             var players = PhotonNetwork.PlayerList;
-            //if (players.Length < 2)
-            //    return;
+            if (players.Length < 2)
+            {
+                return;
+            }
             foreach (var player in players)
                 if ((PlayerColor)player.CustomProperties[PlayerManager.KeyColor] == PlayerColor.None)
                 {

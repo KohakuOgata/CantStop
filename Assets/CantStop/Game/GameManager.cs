@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 using Props = ExitGames.Client.Photon.Hashtable;
+using DG.Tweening;
 using TMPro;
 
 namespace CantStop.Game
@@ -46,6 +47,8 @@ namespace CantStop.Game
 
         public Bell bell;
 
+        public PlayerColor nowColor;
+
         #endregion
 
         #region Private Serialize Fields
@@ -63,10 +66,19 @@ namespace CantStop.Game
         private Fade fade;
 
         [SerializeField]
-        private Transform[] climberSockets = new Transform[3];
+        private DiceResult[] diceResults = new DiceResult[3];
 
         [SerializeField]
-        private DiceResult[] diceResults = new DiceResult[3];
+        private GameObject resultCanvas;
+
+        [SerializeField]
+        private TextMeshProUGUI winnerName;
+
+        [SerializeField]
+        private GameObject waitText;
+
+        [SerializeField]
+        private GameObject backButton;
 
         #endregion
 
@@ -94,6 +106,7 @@ namespace CantStop.Game
             fade.gameObject.SetActive(true);
             players = PhotonNetwork.PlayerList;
             rootManager = RootManager.Instance;
+            PhotonNetwork.LocalPlayer.SetCustomProperties(new Props{ { PlayerManager.KeyScore, 0} });
 
             if (!PhotonNetwork.IsMasterClient)
                 return;
@@ -129,6 +142,12 @@ namespace CantStop.Game
 
         #region Public Methods
 
+        public void BackToLobby()
+        {
+            PhotonNetwork.CurrentRoom.IsOpen = true;
+            PhotonNetwork.LoadLevel("PrepareGame");
+        }
+
         public void LeaveRoom()
         {
             PhotonNetwork.LeaveRoom();
@@ -147,10 +166,52 @@ namespace CantStop.Game
             diceResults[2].SetRoots(new int[] { diceNums[0] + diceNums[3], diceNums[1] + diceNums[2] });
             if (orderedPlayers[nowPlayerIndex] != PhotonNetwork.LocalPlayer)
                 return;
+            bool isAnyButtonOn = false;
             foreach(var diceResult in diceResults)
             {
-                diceResult.ActivateButtons();
+                isAnyButtonOn |= diceResult.ActivateButtons();
             }
+            if (isAnyButtonOn)
+                return;
+            photonView.RPC(nameof(GoNextTurn), RpcTarget.All);
+        }
+
+        public void OnBellClicked()
+        {
+            photonView.RPC(nameof(OnBellClicked), RpcTarget.All);
+        }
+
+        [PunRPC]
+        public void OnBellClicked(PhotonMessageInfo info)
+        {
+            int addScore = 0;
+            foreach(var climber in climbers)
+            {
+                if (climber.rootNum == -1)
+                    continue;
+                if (rootManager.PutTent(climber.rootNum))
+                    addScore += 1;
+            }
+            if (addScore != 0)
+            {
+                var nowPlayer = info.Sender;
+                var score = (int)nowPlayer.CustomProperties[PlayerManager.KeyScore] + addScore;
+                if (score >= 3)
+                {
+                    resultCanvas.SetActive(true);
+                    winnerName.text = nowPlayer.NickName;
+                    winnerName.color = PlayerManager.colors[nowColor];
+                    if (PhotonNetwork.LocalPlayer.IsMasterClient)
+                        backButton.SetActive(true);
+                    else
+                        waitText.SetActive(true);
+                    PhotonNetwork.LocalPlayer.SetCustomProperties(new Props { { PlayerManager.KeyScore, 0 } });
+                    return;
+                }
+                if(PhotonNetwork.LocalPlayer == nowPlayer)
+                    PhotonNetwork.LocalPlayer.SetCustomProperties(new Props { { PlayerManager.KeyScore, score } });
+            }
+            GoNextTurn();
         }
 
         public void OnPressedDiceButton()
@@ -166,7 +227,7 @@ namespace CantStop.Game
         public bool CheckCanClimbRoot(int rootNum)
         {
             var root = RootManager.Instance.GetRoot(rootNum);
-            return !root.hasBeenClimbed && (climbersNumOnRoot < ClimbersNum || root.climbingClimber);
+            return !root.hasBeenClimbed && (climbersNumOnRoot < ClimbersNum || root.climbingClimber != null);
         }
 
         public void OnCompleteClimb()
@@ -189,6 +250,33 @@ namespace CantStop.Game
         #region Private Method
 
         [PunRPC]
+        private void GoNextTurn()
+        {
+            if (PhotonNetwork.LocalPlayer == orderedPlayers[nowPlayerIndex])
+            {
+                bell.Deactivate();
+                diceSwitch.Deactivate();
+            }
+            foreach (var climber in climbers)
+            {
+                if (climber.rootNum == -1)
+                    continue;
+                rootManager.GetRoot(climber.rootNum).Reset();
+                climber.Reset();
+            }
+            climbersNumOnRoot = 0;
+            nowPlayerIndex = (nowPlayerIndex + 1) % PlayerCount;
+            nowPlayerIcon.DOMove(playerNames[nowPlayerIndex].transform.position, .5f);
+            nowColor = (PlayerColor)orderedPlayers[nowPlayerIndex].CustomProperties[PlayerManager.KeyColor];
+            bell.audio.Play();
+            if (PhotonNetwork.LocalPlayer == orderedPlayers[nowPlayerIndex])
+            {
+                diceSwitch.Activate();
+            }
+
+        }
+
+        [PunRPC]
         private void OnCompletedInit()
         {
             orderedPlayers = (Player[])PhotonNetwork.CurrentRoom.CustomProperties[KeyOrderedPlayers];
@@ -197,6 +285,7 @@ namespace CantStop.Game
                 playerNames[i].gameObject.SetActive(true);
                 playerNames[i].SetNameText(orderedPlayers[i]);
             }
+            nowColor = (PlayerColor)orderedPlayers[nowPlayerIndex].CustomProperties[PlayerManager.KeyColor];
             fade.FadeIn();
             if (orderedPlayers[0] != PhotonNetwork.LocalPlayer)
                 return;

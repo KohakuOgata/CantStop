@@ -34,7 +34,13 @@ namespace CantStop
         public void BlinkOff()
         {
             emissiveMaterial.color = color;
-            emissiveMaterial.DOColor(Color.black, fadeTime / 2).SetLoops(2, LoopType.Restart).SetEase(Ease.Linear);
+            emissiveMaterial.DOColor(Color.black, fadeTime).SetLoops(2, LoopType.Restart).SetEase(Ease.Linear);
+        }
+
+        public void ChangeColor(Color newColor)
+        {
+            color = newColor;
+            On();
         }
     }
 }

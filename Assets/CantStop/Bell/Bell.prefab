@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 4014555057739875719}
   - component: {fileID: 4014555057739875715}
   - component: {fileID: 4014555057739875716}
+  - component: {fileID: 4986397771132401478}
   m_Layer: 6
   m_Name: Bell
   m_TagString: Untagged
@@ -32685,7 +32686,7 @@ SphereCollider:
   m_GameObject: {fileID: 4014555057739875838}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.04135616
   m_Center: {x: -0.0003994666, y: -0.035, z: 0.00000083073974}
@@ -32837,6 +32838,22 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &4986397771132401478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4014555057739875838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cc626f468579054080bd84e7c73d3a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshRenderer: {fileID: 4014555057739875835}
+  materialIndex: 3
+  fadeTime: 0.3
+  color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &4014555059023000131
 GameObject:
   m_ObjectHideFlags: 0
