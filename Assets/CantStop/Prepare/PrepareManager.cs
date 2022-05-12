@@ -1,11 +1,9 @@
-using System.Collections;
+using DG.Tweening;
+using Photon.Pun;
+using Photon.Realtime;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Photon.Pun;
-using Photon.Realtime;
-using DG.Tweening;
-using Props = ExitGames.Client.Photon.Hashtable;
 
 namespace CantStop.Prepare
 {
@@ -73,23 +71,16 @@ namespace CantStop.Prepare
                 return;
             }
 
-            if (playerPrefab == null)
+            if (PlayerManager.LocalPlayerInstance == null)
             {
-                Debug.LogError("<Color=Red><b>Missing</b></Color> playerPrefab Reference. Please set it up in GameObject 'Game Manager'", this);
+                Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManagerHelper.ActiveSceneName);
+
+                PhotonNetwork.Instantiate(playerPrefab.name, Vector3.zero, Quaternion.identity, 0);
             }
             else
             {
-                if (PlayerManager.LocalPlayerInstance == null)
-                {
-                    Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManagerHelper.ActiveSceneName);
 
-                    PhotonNetwork.Instantiate(playerPrefab.name, Vector3.zero, Quaternion.identity, 0);
-                }
-                else
-                {
-
-                    Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
-                }
+                Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
             }
 
             pawns.Add(PlayerColor.Red, GameObject.Find("RedPreparePawn").GetComponent<PreparingPawn>());
@@ -101,6 +92,12 @@ namespace CantStop.Prepare
             pivotToStandDistance = Mathf.Sqrt(standPivotHeight * standPivotHeight + standPivotDepth * standPivotDepth);
 
             myStand.SetNameText(PhotonNetwork.LocalPlayer.NickName);
+            if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey(PlayerManager.KeyColor))
+            {
+                pawns[(PlayerColor)PhotonNetwork.LocalPlayer.CustomProperties[PlayerManager.KeyColor]].OnGot(PhotonNetwork.LocalPlayer);
+                bell.Activate();
+            }
+
             for (int i = 0; i < PhotonNetwork.CurrentRoom.PlayerCount - 1; i++)
             {
                 var other = PhotonNetwork.PlayerListOthers[i];
@@ -131,7 +128,7 @@ namespace CantStop.Prepare
 
         #region Photon Callbacks
 
-        public override void OnPlayerEnteredRoom(Photon.Realtime.Player other)
+        public override void OnPlayerEnteredRoom(Player other)
         {
             Debug.Log("OnPlayerEnteredRoom() " + other.NickName + "(" + other.ActorNumber + ")"); // not seen if you're the player connecting
             for (int i = 0; i < PhotonNetwork.CurrentRoom.PlayerCount - 2; i++)

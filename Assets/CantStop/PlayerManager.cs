@@ -34,10 +34,6 @@ namespace CantStop
 
         #endregion
 
-        #region Private Fields
-
-        #endregion
-
         #region MonoBehaviour CallBacks
 
         public void Awake()
@@ -52,14 +48,6 @@ namespace CantStop
             DontDestroyOnLoad(gameObject);
         }
 
-        /// <summary>
-        /// MonoBehaviour method called on GameObject by Unity during initialization phase.
-        /// </summary>
-        public void Start()
-        {
-        }
-
-
         public override void OnDisable()
         {
             // Always call the base to remove callbacks
@@ -67,45 +55,7 @@ namespace CantStop
 
         }
 
-        public void Update()
-        {
-            // we only process Inputs and check health if we are the local player
-            if (photonView.IsMine)
-            {
-
-            }
-        }
-
-#if !UNITY_5_4_OR_NEWER
-        /// <summary>See CalledOnLevelWasLoaded. Outdated in Unity 5.4.</summary>
-        void OnLevelWasLoaded(int level)
-        {
-            this.CalledOnLevelWasLoaded(level);
-        }
-#endif
         #endregion
 
-        #region Public Static Methods
-
-        public static PlayerColor IntToColor(int i)
-        {
-            return (PlayerColor)System.Enum.ToObject(typeof(PlayerColor), i);
-        }
-
-        #endregion
-
-        #region Private Methods
-
-
-#if UNITY_5_4_OR_NEWER
-
-#endif
-
-        #endregion
-
-        #region IPunObservable implementation
-
-
-        #endregion
     }
 }
