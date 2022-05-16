@@ -2,6 +2,7 @@ using DG.Tweening;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -47,6 +48,9 @@ namespace CantStop.Prepare
         [SerializeField]
         private Bell bell;
 
+        [SerializeField]
+        private TextMeshProUGUI roomName;
+
         #endregion
 
         #region privarte Fields
@@ -71,6 +75,8 @@ namespace CantStop.Prepare
                 return;
             }
 
+            roomName.text = PhotonNetwork.CurrentRoom.Name;
+
             if (PlayerManager.LocalPlayerInstance == null)
             {
                 Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManagerHelper.ActiveSceneName);
@@ -92,7 +98,7 @@ namespace CantStop.Prepare
             pivotToStandDistance = Mathf.Sqrt(standPivotHeight * standPivotHeight + standPivotDepth * standPivotDepth);
 
             myStand.SetNameText(PhotonNetwork.LocalPlayer.NickName);
-            if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey(PlayerManager.KeyColor))
+            if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey(PlayerManager.KeyColor) && (PlayerColor)PhotonNetwork.LocalPlayer.CustomProperties[PlayerManager.KeyColor] != PlayerColor.None)
             {
                 pawns[(PlayerColor)PhotonNetwork.LocalPlayer.CustomProperties[PlayerManager.KeyColor]].OnGot(PhotonNetwork.LocalPlayer);
                 bell.Activate();

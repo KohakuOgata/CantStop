@@ -52,7 +52,7 @@ namespace CantStop
                 fadeTime
                 )).
 
-                OnUpdate(() => emissiveMaterial.SetColor(emissiveColorKey, nowColor * 4));
+                OnUpdate(() => emissiveMaterial.SetColor(emissiveColorKey, nowColor * nowColor * 4));
         }
         public void Off()
         {
@@ -79,7 +79,7 @@ namespace CantStop
                 fadeTime
                 )).
 
-                OnUpdate(() => emissiveMaterial.SetColor(emissiveColorKey, nowColor * 4));
+                OnUpdate(() => emissiveMaterial.SetColor(emissiveColorKey, nowColor * nowColor * 4));
         }
 
         public void ChangeColor(Color newColor)

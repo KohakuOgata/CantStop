@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 
-namespace CantStop
+namespace CantStop.Launcher
 {
 	public class Launcher : MonoBehaviourPunCallbacks
 	{
@@ -93,10 +93,7 @@ namespace CantStop
 			// we check if we are connected or not, we join if we are , else we initiate the connection to the server.
 			if (PhotonNetwork.IsConnected)
 			{
-				LogFeedback("Joining Room...");
-				Debug.Log("Joining Room...");
-				// #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
-				PhotonNetwork.JoinRandomRoom();
+				JoinNamedOrRandomRoom();
 			}
 			else
 			{
@@ -144,11 +141,8 @@ namespace CantStop
 			// we don't want to do anything.
 			if (isConnecting)
 			{
-				LogFeedback("OnConnectedToMaster: Next -> try to Join Random Room");
-				Debug.Log("PUN Basics Tutorial/Launcher: OnConnectedToMaster() was called by PUN. Now this client is connected and could join a room.\n Calling: PhotonNetwork.JoinRandomRoom(); Operation will fail if no room found");
-
-				// #Critical: The first we try to do is to join a potential existing room. If there is, good, else, we'll be called back with OnJoinRandomFailed()
-				PhotonNetwork.JoinRandomRoom();
+				Debug.Log("PUN Basics Tutorial/Launcher: OnConnectedToMaster() was called by PUN. Now this client is connected and could join a room.");
+				JoinNamedOrRandomRoom();
 			}
 		}
 
@@ -210,6 +204,24 @@ namespace CantStop
 				PhotonNetwork.LoadLevel("PrepareGame");
 
 			}
+		}
+
+        #endregion
+
+        #region Private Methods
+
+		void JoinNamedOrRandomRoom()
+        {
+			var roomName = RoomNameInputField.RoomName;
+			if (string.IsNullOrEmpty(roomName))
+			{
+				LogFeedback("try to Join Random Room");
+				PhotonNetwork.JoinRandomRoom();
+
+				return;
+			}
+			LogFeedback("Join or Create Named Room");
+			PhotonNetwork.JoinOrCreateRoom(roomName, new RoomOptions { MaxPlayers = this.maxPlayersPerRoom, IsVisible = false }, TypedLobby.Default);
 		}
 
 		#endregion
